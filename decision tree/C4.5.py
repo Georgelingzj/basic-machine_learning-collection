@@ -1,18 +1,13 @@
 """
 C4.5 decision tree
 
+degree == 2
+
 """
 
 from sklearn.datasets import load_iris
 import numpy as np
 import math
-
-
-
-class Node():
-    def __init__(self):
-        self.left = None
-        self.right = None
 
 
 def load_data():
@@ -179,6 +174,7 @@ def GainRadio(X,y):
 
             Gain_inside.update({Gain_in:decision_value})
 
+
         Gain_inside = sorted(Gain_inside.items(),key=lambda x:x[0],reverse=True)
 
         max_entro = Gain_inside[0][0]
@@ -189,20 +185,58 @@ def GainRadio(X,y):
 
         dic_max_feature.update({max_entro_radio:max_value})
 
-
+    #print(dic_max_feature)
     """
     get dic with key is Gainradio
     value is split value
     """
-    # print(dic_max_feature)
-    dic_ = sorted(dic_max_feature.items(),key=lambda x:x[0],reverse=True)
+
+    feature_index = 0
+    dic_ = {}
+
+    for key,value in dic_max_feature.items():
+        inside = {feature_index:value}
+        dic_.update({key:inside})
+        feature_index += 1
+
+    #print(dic_)
+
+    dic_ = sorted(dic_.items(),key=lambda x:x[0],reverse=True)
 
     max_radio_feature = dic_[0]
-    print(max_radio_feature)
+
+    return max_radio_feature, data_whole
+
+#
+# def build_tree(data1, data2, decision_value):
 
 
+def split_dataset(dic_, data_whole):
 
 
+    dic_ = dic_[1]
+    dic_ = dic_.popitem()
+
+    feature_index = dic_[0]
+    feature_value = dic_[1]
+
+    # sort data by col == feature_index
+    data = data_whole[np.argsort(data_whole[:, feature_index])]
+
+
+    # print(data)
+
+    # split whole data set
+    for i in range(data.shape[0]):
+        if data[i, feature_index] == feature_value:
+            data1 = data[:i, ]
+            data2 = data[i:, ]
+            break
+
+    data1 = np.delete(data1,1,axis=feature_index)
+    data2 = np.delete(data2, 1, axis=feature_index)
+
+    return data1, data2, feature_value
 
 
 
@@ -211,11 +245,14 @@ def GainRadio(X,y):
 def run():
     train_X, train_y,_ ,_ = train_test_split()
 
-    GainRadio(train_X,train_y)
+    max_feature, data_whole = GainRadio(train_X,train_y)
 
+    data1, data2, s = split_dataset(max_feature,data_whole)
+    print(data1)
 
+    print(data2)
 
-
+    print(s)
 
 
 
